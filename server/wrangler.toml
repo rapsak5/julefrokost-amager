@@ -1,0 +1,8 @@
+# Cloudflare Worker til den fælles topscorerliste. Se README.md, afsnittet "Online".
+name = "julefrokost-scores"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+[[kv_namespaces]]
+binding = "SCORES"
+id = "4583bb2e18a04cd18da8f9baf1c38cc6"   # julefrokost-scores, oprettet 23/11 2026

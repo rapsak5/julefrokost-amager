@@ -1,0 +1,14 @@
+{
+  "name": "julefrokost-paa-amager",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Et lille 16-bit browserspil som opvarmning til julefrokosten på Amager",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "assets": "python3 tools/build_assets.py",
+    "test": "node tools/test_worker.mjs && node tools/test_play.cjs && node tools/test_flow.cjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.0.0"
+  }
+}
