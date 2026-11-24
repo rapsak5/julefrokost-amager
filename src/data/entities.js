@@ -15,13 +15,25 @@
 
 import { GROUND_Y } from '../config.js';
 
+// Det, der går på jorden (d), er ikke længere duer. Hver d bliver en af disse fire, skiftevis
+// efter placering i banen. vx på selve d er den hurtigste, så banens luft-beregning er på den sikre side.
+const WALKERS = [
+  { anim: 'cat_walk', box: [40, 26], vx: -45, score: 200 },
+  { anim: 'dog_walk', box: [46, 30], vx: -60, score: 250 },
+  { anim: 'scooter', box: [30, 44], vx: -75, score: 250 },
+  { anim: 'bike', box: [48, 40], vx: -90, score: 300 },
+];
+
+// Ved vandet flyver der måger i stedet for duer.
+const GULL = { anim: 'gull_fly', box: [40, 20] };
+
 export const ENTITIES = {
   b: { kind: 'pickup', effect: 'beer', frame: 'item/beer', box: [18, 28], bob: 3 },
   s: { kind: 'pickup', effect: 'shot', frame: 'item/shot', box: [28, 28], bob: 3 },
   h: { kind: 'pickup', effect: 'heart', frame: 'item/heart', box: [32, 28], bob: 3 },
   q: { kind: 'quiz', frame: 'item/quiz', box: [46, 42], bob: 2 },
 
-  d: { kind: 'enemy', anim: 'due_walk', box: [34, 26], vx: -28, hittable: true, hp: 1, score: 200, fx: 'fx/feather' },
+  d: { kind: 'enemy', anim: 'cat_walk', box: [40, 26], vx: -90, variants: WALKERS, hittable: true, hp: 1, score: 200, fx: 'fx/puff' },
   f: { kind: 'enemy', anim: 'due_fly', box: [36, 20], vx: -70, wave: 6, low: true, hittable: true, hp: 1, score: 300, fx: 'fx/feather' },
   k: { kind: 'enemy', frame: 'obst/crate', box: [30, 24], hittable: true, hp: 1, score: 100, fx: 'fx/puff' },
   m: { kind: 'enemy', anim: 'dozer', box: [70, 44], vx: -45, hittable: true, hp: 2, score: 500, fx: 'fx/puff' },
@@ -39,7 +51,7 @@ export const ENTITIES = {
 const ROLL_Y = GROUND_Y - 16;   // ting der ruller på jorden, tegnes omkring deres midte
 
 export const THEMES = {
-  dragoer: { snow: true },
+  dragoer: { snow: true, ents: { f: GULL } },
   lufthavn: {
     ents: {
       d: { anim: 'drone', box: [46, 22], anchor: 'center', y: GROUND_Y - 22, vx: -40, wave: 4, score: 250, fx: 'fx/puff' },
@@ -102,5 +114,5 @@ export function entityDef(type, themeKey) {
   const base = ENTITIES[type];
   if (!base) throw new Error(`Ukendt tegn "${type}" i en bane`);
   const over = THEMES[themeKey]?.ents?.[type];
-  return over ? { ...base, ...over } : base;
+  return over ? { ...base, variants: undefined, ...over } : base;
 }

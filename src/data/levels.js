@@ -248,6 +248,7 @@ function spaceOut(rows, level) {
   const map = [];
   let lastKind = null;
   let lastEff = -99;
+  let walkers = 0;   // tæller d'erne, så hver får samme figur her som i buildLevel
   for (let i = 0; i < n; i++) {
     const cell = { hi: rows.hi[i], mid: rows.mid[i], lo: rows.lo[i], fl: rows.fl[i] };
     let kind = null;
@@ -256,7 +257,8 @@ function spaceOut(rows, level) {
       const t = cell[r];
       if (!KIND[t]) continue;
       if (!kind || KIND[t] === 'jump') kind = KIND[t];
-      const vx = Math.abs(entityDef(t, level.theme).vx || 0);
+      const def = entityDef(t, level.theme);
+      const vx = Math.abs((t === 'd' && def.variants ? def.variants[walkers++ % def.variants.length] : def).vx || 0);
       drift = Math.max(drift, (vx * (ahead / v)) / COL);
     }
     if (cell.fl === '_' && rows.fl[i - 1] !== '_') kind = 'jump';
@@ -305,6 +307,8 @@ export function buildLevel(level) {
     [...rows[row]].forEach((type, i) => { if (type !== '.') spawns.push({ type, row, x: i * COL + COL / 2 }); });
   }
   spawns.sort((a, b) => a.x - b.x);
+  let walkers = 0;
+  for (const s of spawns) if (s.type === 'd') s.v = walkers++;   // hvilken figur d bliver (se WALKERS i entities.js)
   const pits = [];
   let start = -1;
   [...rows.fl, '#'].forEach((c, i) => {
