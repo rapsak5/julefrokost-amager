@@ -14,7 +14,7 @@ python3 -m http.server 8080
 
 Åbn derefter `http://localhost:8080`. Filen kan ikke åbnes direkte fra disken, fordi browseren kræver en webserver til JavaScript-moduler.
 
-Genveje til test: `?level=3` starter direkte i bane 3, `?scene=Secret` åbner en bestemt skærm, `?alle=1` åbner alle baner, `?fisher=mark` vælger fisker.
+Genvej: `?scene=Scores` åbner topscorerlisten direkte. Testgenvejene (`?level`, `?alle`, `?fisher`, `?scene=Secret`) er fjernet i den udgivne version (24/11) for at undgå snyd.
 
 ## Styring
 
