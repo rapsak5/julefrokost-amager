@@ -57,12 +57,8 @@ export default class BootScene extends Phaser.Scene {
     loop('shark', ['enemy/shark0', 'enemy/shark1'], 6);
     loop('jelly', ['enemy/jelly0', 'enemy/jelly1'], 4);
 
-    // Genvej til test: ?level=3 starter direkte i bane 3, ?tutorial=1 åbner øvebanen, ?scene=Secret åbner en bestemt skærm, ?alle=1 åbner alle baner
+    // Kun topscorerlisten kan åbnes direkte: ?scene=Scores. Testgenvejene er fjernet i den udgivne version.
     const q = new URLSearchParams(window.location.search);
-    if (q.get('fisher')) Save.setFisher(q.get('fisher'));
-    if (q.get('alle')) { for (const f of FISHERS) Save.player(f.id).unlocked = LEVELS.length; }
-    if (q.get('tutorial')) this.scene.start('Level', { tutorial: true });
-    else if (q.get('level')) this.scene.start('Level', { levelIndex: Number(q.get('level')) - 1 });
-    else this.scene.start(q.get('scene') || 'Title');
+    this.scene.start(q.get('scene') === 'Scores' ? 'Scores' : 'Title');
   }
 }
