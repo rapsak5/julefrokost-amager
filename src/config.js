@@ -55,4 +55,7 @@ export const SCORES_CLOSE_UTC = EVENT_TIME_UTC;
 // Sæt til adressen på Cloudflare Workeren i server/, fx 'https://julefrokost-scores.<konto>.workers.dev'.
 export const SCORES_URL = null;
 
+// Gutternes udgave: ingen checkpoints. En bane klares i ét hug, ellers starter man forfra.
+export const CHECKPOINTS = false;
+
 export const SAVE_KEY = 'amager-julefrokost-v1';
