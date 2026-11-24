@@ -53,7 +53,7 @@ export const SCORES_CLOSE_UTC = EVENT_TIME_UTC;
 
 // Fælles topscorerliste. null = listen gemmes kun på den enkelte telefon.
 // Sæt til adressen på Cloudflare Workeren i server/, fx 'https://julefrokost-scores.<konto>.workers.dev'.
-export const SCORES_URL = null;
+export const SCORES_URL = 'https://julefrokost-scores.stemplerind.workers.dev';
 
 // Gutternes udgave: ingen checkpoints. En bane klares i ét hug, ellers starter man forfra.
 export const CHECKPOINTS = false;
