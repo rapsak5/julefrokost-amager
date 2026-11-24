@@ -21,8 +21,8 @@ export default class TitleScene extends Phaser.Scene {
 
     const id = Save.load().fisher || DEFAULT_FISHER;
     this.add.sprite(150, GROUND_Y, 'atlas', `fisher/${id}/run0`).setOrigin(0.375, 1).play(`${id}_run`);
-    this.add.sprite(540, GROUND_Y, 'atlas', 'due/walk0').setOrigin(0.5, 1).play('due_walk');
-    this.add.sprite(520, GROUND_Y - 150, 'atlas', 'due/fly0').play('due_fly');
+    this.add.sprite(540, GROUND_Y, 'atlas', 'enemy/cat0').setOrigin(0.5, 1).play('cat_walk');
+    this.add.sprite(520, GROUND_Y - 150, 'atlas', 'enemy/gull0').play('gull_fly');
 
     txt(this, GAME_W / 2, 20, 'Gutterne præsenterer', { font: 'ui_o' });
     txt(this, GAME_W / 2, 56, 'JULEFROKOST', { font: 'big_o', scale: 3 });

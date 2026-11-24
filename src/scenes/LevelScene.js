@@ -6,7 +6,7 @@
 //   this.st        tilstand til HUD: hearts, meter (ølmåler), bottles, score
 //   this.treadmill ekstra rul under bosskampen, hvor fiskeren står stille på skærmen
 
-import { GAME_W, GAME_H, GROUND_Y, PLAYER_SCREEN_X, ROW_Y, SWIM_Y, TUNING, SCORE, DEPTH } from '../config.js';
+import { CHECKPOINTS, GAME_W, GAME_H, GROUND_Y, COL, PLAYER_SCREEN_X, ROW_Y, SWIM_Y, TUNING, SCORE, DEPTH } from '../config.js';
 import { LEVELS, TUTORIAL, buildLevel } from '../data/levels.js';
 import { entityDef, THEMES } from '../data/entities.js';
 import { QUIZ } from '../data/quiz.js';
@@ -208,7 +208,10 @@ export default class LevelScene extends Phaser.Scene {
   spawn(sp, over = null) {
     let def = entityDef(sp.type, this.level.theme);
     if (over) def = { ...def, ...over };
+    // kat, kamphund, løbehjul eller cyklist: skiftevis efter placering, så banen er den samme hver gang
+    if (def.variants) def = { ...def, ...def.variants[(sp.v ?? Math.floor(sp.x / COL)) % def.variants.length] };
     if (def.kind === 'boss') { this.bossTriggerX = sp.x; return null; }
+    if (def.kind === 'checkpoint' && !CHECKPOINTS) return null;   // se CHECKPOINTS i config.js
     const floating = def.kind === 'pickup' || def.kind === 'quiz';
     let bottom = def.anchor ? def.anchor === 'bottom' : (sp.row === 'lo' && !floating);
     let y = def.y ?? ROW_Y[sp.row];
@@ -272,7 +275,10 @@ export default class LevelScene extends Phaser.Scene {
             if (d.hittable) { this.hitEnemy(e); break; }
             if (d.bonk && !e.bonked) { e.bonked = true; this.popup(d.bonk, e.s.x, r.y - 10, 0xffffff); }
           }
-          if (overlap(hurt, r)) this.hurt();
+          if (overlap(hurt, r)) {
+            if (this.isStomp(p, hurt, r, d, dt)) { this.stomp(e, now); break; }
+            this.hurt();
+          }
           break;
         case 'checkpoint':
           if (!e.done && p.x >= e.s.x) this.reachCheckpoint(e);
@@ -311,6 +317,27 @@ export default class LevelScene extends Phaser.Scene {
     }
     this.burst(x, y, 'fx/star', 4);
     this.emitHud();
+  }
+
+  /**
+   * Hop på hovedet: lander fiskeren oven på noget, der kan slås, tæller det som et slag.
+   * Kræver at han er på vej ned, og at fødderne var over tingens top i forrige billede.
+   * Gælder ikke under vand (Den Blå Planet).
+   */
+  isStomp(p, hurt, r, d, dt) {
+    if (this.swim || !d.hittable || p.onGround) return false;
+    const vy = p.body.velocity.y;
+    if (vy <= 0) return false;
+    const feetBefore = hurt.y + hurt.h - vy * dt;
+    return feetBefore <= r.y + 10;
+  }
+
+  stomp(e, now) {
+    const p = this.player;
+    this.hitEnemy(e);
+    p.body.setVelocityY(TUNING.jumpV * 0.72);   // lille hop op igen
+    p.onGround = false;
+    p.invulnUntil = Math.max(p.invulnUntil || 0, now + 160);   // ingen skade fra det, man lige har trådt på
   }
 
   hitEnemy(e) {

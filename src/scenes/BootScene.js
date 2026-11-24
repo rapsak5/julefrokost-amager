@@ -43,6 +43,11 @@ export default class BootScene extends Phaser.Scene {
     }
     loop('due_walk', ['due/walk0', 'due/walk1'], 6);
     loop('due_fly', ['due/fly0', 'due/fly1'], 8);
+    loop('cat_walk', ['enemy/cat0', 'enemy/cat1'], 6);
+    loop('dog_walk', ['enemy/dog0', 'enemy/dog1'], 7);
+    loop('scooter', ['enemy/scooter0', 'enemy/scooter1'], 6);
+    loop('bike', ['enemy/bike0', 'enemy/bike1'], 8);
+    loop('gull_fly', ['enemy/gull0', 'enemy/gull1'], 5);
     loop('goose_walk', ['enemy/goose0', 'enemy/goose1'], 6);
     loop('dozer', ['enemy/dozer0', 'enemy/dozer1'], 8);
     loop('boss_fly', ['boss/0', 'boss/1'], 5);
