@@ -107,6 +107,62 @@ export const THEMES = {
       l: { frame: 'obst/lamp', box: [60, 28] },
     },
   },
+  // Islands Brygge (25/11): løse kamphunde, måger, boomblastere, rockere og folk, der fester i badetøj.
+  // Rockere og festaber kan man ikke slå: hop over dem. Flagguirlanderne skal man slide under.
+  brygge: {
+    snow: true,
+    midFrames: 2,
+    ents: {
+      d: { anim: 'dog_walk', box: [46, 30], vx: -85, variants: [{ anim: 'dog_walk', box: [46, 30], vx: -85, score: 250 }], score: 250 },
+      f: { anim: 'gull_fly', box: [40, 20], vx: -80, score: 300 },
+      k: { frame: 'obst/boombox', box: [40, 28], score: 250, fx: 'fx/star' },
+      o: { frame: 'obst/beachball', box: [24, 24] },
+      x: {
+        anim: 'rocker_walk', box: [32, 54], vx: -26, bonk: "HVA' GLOR DU PÅ?",
+        variants: [{ anim: 'rocker_walk', box: [32, 54], vx: -26, bonk: "HVA' GLOR DU PÅ?" }, { anim: 'bather_dance', box: [30, 64], vx: -20, bonk: 'SKÅÅÅL!' }],
+      },
+      l: { frame: 'obst/garland', box: [78, 28] },
+    },
+  },
+  // Amager Bio: fadøl i stedet for flasker, flightcases der ruller, kastede krus og trommestikker,
+  // monitorer på gulvet, en mikrofon der svinger fra loftet, og trommesæt og guitarister man skal hoppe over.
+  amagerbio: {
+    midFrames: 2,
+    ents: {
+      b: { frame: 'item/fadoel' },
+      d: { frame: 'obst/flightcase', anim: null, box: [40, 30], vx: -90, score: 250, fx: 'fx/puff' },
+      f: {
+        frame: 'obst/cup', anim: null, box: [20, 22], vx: -160, wave: 0, spin: -540, score: 250, fx: 'fx/foam',
+        variants: [{ frame: 'obst/cup', box: [20, 22], vx: -150, spin: -540, score: 250 }, { frame: 'obst/stick', box: [30, 10], vx: -160, spin: -720, score: 300 }],
+      },
+      k: { frame: 'obst/monitor', box: [40, 26], score: 150 },
+      x: {
+        frame: 'obst/drums', box: [50, 40], vx: -26, bonk: 'BOING!',
+        variants: [{ frame: 'obst/drums', anim: null, box: [50, 40], vx: 0, bonk: 'BOING!' }, { anim: 'guitar_walk', box: [32, 56], vx: -26, bonk: "ROCK'N'ROLL!" }],
+      },
+      // sway: hvor langt (radianer) mikrofonen svinger, swayMs: hvor hurtigt
+      l: { frame: 'obst/mic', box: [30, 30], sway: 0.14, swayMs: 450 },
+    },
+  },
+  // Amager Strandpark: kitesurfere og måger i luften, redningskranse der ruller, badebolde der hopper,
+  // sandslotte, håndklæder på snor og parasoller og nudister, man skal hoppe over.
+  strandpark: {
+    snow: true,
+    ents: {
+      d: { frame: 'obst/buoy', anim: null, box: [26, 26], anchor: 'center', y: ROLL_Y, vx: -100, spin: -360, score: 200, fx: 'fx/puff' },
+      f: {
+        anim: 'kite_fly', box: [46, 24], vx: -120, wave: 10, score: 350, fx: 'fx/puff',
+        variants: [{ anim: 'kite_fly', box: [46, 24], vx: -120, score: 350 }, { anim: 'gull_fly', box: [40, 20], vx: -70, score: 300 }],
+      },
+      k: { frame: 'obst/sandcastle', box: [34, 28], score: 150 },
+      o: { frame: 'obst/beachball', box: [24, 24] },
+      x: {
+        frame: 'obst/parasol', box: [40, 44], vx: -40, bonk: 'AV!',
+        variants: [{ frame: 'obst/parasol', anim: null, box: [40, 44], vx: 0, bonk: 'AV!' }, { anim: 'nudist_run', box: [30, 60], vx: -40, bonk: 'HOV! TAG TØJ PÅ!' }],
+      },
+      l: { frame: 'obst/towels', box: [78, 28] },
+    },
+  },
   copenhill: { snow: true, ents: { k: { frame: 'obst/ski', box: [40, 44], vx: -110, score: 250 } } },
 };
 

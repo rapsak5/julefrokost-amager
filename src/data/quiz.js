@@ -1,7 +1,17 @@
 // Spørgsmål til quizkasserne. Kun om Amager. Det første svar er altid det rigtige.
-// Rækkefølgen af svarene blandes i spillet. Fakta tjekket 23/11 2026.
+// Rækkefølgen af svarene blandes i spillet. Fakta tjekket 23/11 2026 (Islands Brygge 25/11).
 
 export const QUIZ = [
+  { q: 'Hvad var Amager Bio, før det blev spillested?', a: ['En biograf', 'En fabrik', 'En svømmehal'] },
+  { q: 'Hvilket år blev Amager Bio et spillested?', a: ['1997', '1986', '2005'] },
+  { q: 'Hvad hedder Amager Bios lille scene?', a: ['BETA', 'ALFA', 'Lillesalen'] },
+  { q: 'Hvilken vej ligger Amager Bio på?', a: ['Øresundsvej', 'Holmbladsgade', 'Amagerbrogade'] },
+  { q: 'Hvor mange stående gæster kan Amager Bio cirka rumme?', a: ['1.300', '500', '3.000'] },
+  { q: 'Hvilket år åbnede Amager Strandpark med den kunstige ø?', a: ['2005', '1998', '2011'] },
+  { q: 'Hvor lang er stranden i Amager Strandpark cirka?', a: ['4,6 km', '2 km', '8 km'] },
+  { q: 'Hvad hedder badeanstalten på pæle i nordenden af Amager Strand?', a: ['Helgoland', 'Sneglen', 'Kalvebod Bølge'] },
+  { q: 'Hvor mange vindmøller blev rejst på Middelgrunden i 2000?', a: ['20', '12', '40'] },
+  { q: 'Hvad ligger mellem den kunstige ø og den gamle strand?', a: ['En lagune', 'En kanal', 'En lystbådehavn'] },
   { q: 'Hvilke tre kommuner ligger på Amager?', a: ['København, Tårnby og Dragør', 'København, Tårnby og Hvidovre', 'Tårnby, Dragør og Brøndby'] },
   { q: 'Hvad kalder man en person fra Amager?', a: ['Amagerkaner', 'Amagerianer', 'Amagrer'] },
   { q: 'Hvilken konge inviterede hollandske bønder til Amager i 1521?', a: ['Christian 2.', 'Christian 4.', 'Frederik 2.'] },
@@ -30,8 +40,12 @@ export const QUIZ = [
   { q: 'Hvad lå der i bygningerne, før de blev til Amager Centret?', a: ['Et rebslageri', 'Et bryggeri', 'En kaserne'] },
   { q: 'Hvad hedder hovedgaden på Amager?', a: ['Amagerbrogade', 'Strøget', 'Vesterbrogade'] },
   { q: 'Hvilket år åbnede havnebadet på Islands Brygge som byens første?', a: ['2002', '1995', '2010'] },
+  { q: 'Hvilket land er Islands Brygge opkaldt efter?', a: ['Island', 'Irland', 'Grønland'] },
+  { q: 'Hvilket år blev den nuværende Langebro indviet?', a: ['1954', '1903', '1990'] },
+  { q: 'Hvor mange badegæster er havnebadet på Islands Brygge bygget til?', a: ['Cirka 600', 'Cirka 150', 'Cirka 3.000'] },
+  { q: 'Hvem tegnede havnebadet på Islands Brygge?', a: ['PLOT (Bjarke Ingels og Julien De Smedt)', 'Henning Larsen', '3XN'] },
   { q: 'Hvad hedder indkøbscentret i Ørestad, der åbnede i 2004?', a: ["Field's", 'Fisketorvet', 'Waves'] },
   { q: 'Hvilket band indviede Royal Arena i 2017?', a: ['Metallica', 'U2', 'Volbeat'] },
-  { q: 'Hvilken bodega ligger på Holmbladsgade?', a: ['Jaguaren', 'Eiffel Bar', 'Toga'] },
   { q: 'Hvad hedder naturområdet mellem Islands Brygge og Ørestad?', a: ['Amager Fælled', 'Fælledparken', 'Utterslev Mose'] },
+  { q: 'Hvilken bodega ligger på Holmbladsgade?', a: ['Jaguaren', 'Eiffel Bar', 'Toga'] },
 ];

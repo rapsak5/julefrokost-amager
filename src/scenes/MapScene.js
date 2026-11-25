@@ -1,5 +1,6 @@
 // Oververdenskortet over Amager. Nord er opad, og ruten starter i Dragør mod sydøst.
-// Baner åbnes én ad gangen. Knudernes placering står i NODES (spilpixels på kortbilledet).
+// Baner åbnes én ad gangen. lx og ly flytter navnet, ox er navnets ankerpunkt (0 venstre, 0.5 midt, 1 højre).
+// Knudernes placering står i NODES (spilpixels på kortbilledet).
 
 import { GAME_W, GAME_H } from '../config.js';
 import { LEVELS } from '../data/levels.js';
@@ -16,8 +17,11 @@ const NODES = {
   faelled: { x: 248, y: 204, lx: -22, ox: 1 },
   dr: { x: 232, y: 160, lx: -22, ox: 1 },
   campus: { x: 228, y: 118, lx: -22, ox: 1 },
-  center: { x: 296, y: 108, lx: 22, ox: 0 },
-  jaguaren: { x: 322, y: 76, lx: 22, ox: 0 },
+  brygge: { x: 192, y: 92, lx: -18, ox: 1 },
+  center: { x: 296, y: 108, lx: -10, ly: 24, ox: 0.5 },
+  amagerbio: { x: 348, y: 110, lx: 22, ox: 0 },
+  jaguaren: { x: 322, y: 76, lx: -22, ox: 1 },
+  strandpark: { x: 394, y: 70, lx: 0, ly: 22, ox: 0.5 },
   copenhill: { x: 340, y: 40, lx: 22, ox: 0 },
 };
 const CITY = { x: 150, y: 34 };
@@ -52,7 +56,7 @@ export default class MapScene extends Phaser.Scene {
     LEVELS.forEach((l, i) => {
       const n = NODES[l.id];
       txt(this, n.x, n.y, String(i + 1), { font: 'small_o', scale: 2 }).setDepth(2);
-      txt(this, n.x + n.lx, n.y, l.name.toUpperCase(), { font: 'small_o', ox: n.ox }).setDepth(2);
+      txt(this, n.x + n.lx, n.y + (n.ly || 0), l.name.toUpperCase(), { font: 'small_o', ox: n.ox }).setDepth(2);
       this.add.zone(n.x, n.y, 48, 48).setInteractive({ useHandCursor: true }).on('pointerup', () => this.select(i, true));
     });
 

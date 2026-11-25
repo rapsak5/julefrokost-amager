@@ -67,6 +67,16 @@ export const CHUNKS = {
   dfdf: { mid: '........f.........f.', lo: '..d.........d.......' },
   xlx: { hi: '..b................', mid: '..........l........', lo: '..x...............x.' },
   pdp: { hi: '..bb..........bb..', lo: '.........d........', fl: '##__##########__##' },
+  // brutale (25/11): flere forskellige bevægelser lige efter hinanden. spaceOut() holder dem mulige
+  pxp: { hi: '..bb...b......bb..', lo: '.......x..........', fl: '##__##########__##' },
+  fxf: { hi: '......b.....', mid: '..f.......f.', lo: '......x.....' },
+  lxl: { hi: '.......b........', mid: '..l...........l.', lo: '.......x........' },
+  dpd: { hi: '......bb.......', lo: '..d..........d.', fl: '######__#######' },
+  kxkx: { hi: '......b.....b.', lo: '..k...x...k.x.' },
+  pfp: { hi: '..bb.......bb..', mid: '.......f.......', fl: '##__#######__##' },
+  dldl: { mid: '.......l.........l', lo: '..d.........d.....' },
+  xpl: { hi: '..b...bb........', mid: '.............l..', lo: '..x.............', fl: '######__########' },
+  ppd: { hi: '..bb.....bb......', lo: '...............d.', fl: '##__#####__######' },
   // kun Sundby Idrætspark (bolde)
   ooo: { hi: '....o.....o.....o.' },
   od: { hi: '....o......', lo: '.........d.' },
@@ -94,6 +104,9 @@ export const CHUNKS = {
   wsh: { hi: '..x.....', mid: '....d...', lo: '..x.....' },
   wjj: { hi: '....x.....x', mid: '.x.....x...', lo: '....x.....x' },
   wdd2: { hi: '..d.....', mid: '.....x..', lo: '..d.....' },
+  wzz: { hi: '..x.....x...', mid: '.....x.....x', lo: '..x.....x...' },
+  wsl: { hi: '..x..d..x...', mid: '..x.....x...', lo: '.....x.....b' },
+  wdz: { hi: '.....x....d', mid: '..d..x.....', lo: '..x.....x..' },
   // ting at samle op
   q: { mid: '..q..' },
   s: { hi: '.s.' },
@@ -118,84 +131,110 @@ export const TUTORIAL = {
 // Banerne bygges af en kort indledning (intro), bølger og en afslutning (outro).
 // Hver bølge trækker n byggeklodser fra en pulje, så banen bliver sværere hen ad vejen.
 // Trækningen er fast pr. bane (samme bane hver gang), så man kan lære den.
-// Mellem bølgerne kommer et checkpoint. quiz: true og shot: true lægger en quizkasse
+// Mellem bølgerne kommer et checkpoint (kun hvor CHECKPOINTS er slået til). quiz: true og shot: true lægger en quizkasse
 // eller et shot midt i bølgen, hint viser en besked lige før bølgen.
 // speed: [start, slut] i px/sek. Farten stiger jævnt gennem banen.
 // extra: banens egne klodser, der lægges i puljerne (fx bolde på stadion).
 // ---------------------------------------------------------------------------
 export const POOLS = {
-  easy: ['k', 'd', 'f', 'l', 'x', 'p', 'kk', 'dd', 'ff'],
-  med: ['kd', 'xd', 'df', 'kl', 'lk', 'pk', 'pd', 'll', 'pp', 'dfd', 'kfk'],
-  hard: ['xdx', 'lfl', 'pkf', 'ppp', 'kfkf', 'xx', 'dfdf', 'xlx', 'pdp', 'dfd', 'kfk'],
+  easy: ['k', 'd', 'f', 'l', 'x', 'p', 'kk', 'dd', 'ff', 'kd', 'xd'],
+  med: ['kd', 'xd', 'df', 'kl', 'lk', 'pk', 'pd', 'll', 'pp', 'dfd', 'kfk', 'xx', 'pdp'],
+  hard: ['xdx', 'lfl', 'pkf', 'ppp', 'kfkf', 'xx', 'dfdf', 'xlx', 'pdp', 'dfd', 'kfk', 'pxp', 'fxf', 'lxl'],
+  // brutal (25/11): det sværeste, og de sidste baner trækker mest herfra
+  brutal: ['pxp', 'fxf', 'lxl', 'dpd', 'kxkx', 'pfp', 'dldl', 'xpl', 'ppd', 'xdx', 'lfl', 'ppp', 'xlx', 'dfdf'],
 };
 export const SWIM_POOLS = {
-  easy: ['wb', 'wb2', 'wx1', 'wx2', 'wk', 'wd1', 'wd2', 'wd3', 'wf'],
-  med: ['wx3', 'wxx', 'wxx2', 'wdd', 'wdx', 'wkk', 'wf2'],
-  hard: ['wzig', 'wsh', 'wjj', 'wdd2', 'wxx', 'wxx2', 'wdx'],
+  easy: ['wb2', 'wx1', 'wx2', 'wk', 'wd1', 'wd2', 'wd3', 'wf', 'wx3'],
+  med: ['wx3', 'wxx', 'wxx2', 'wdd', 'wdx', 'wkk', 'wf2', 'wzig'],
+  hard: ['wzig', 'wsh', 'wjj', 'wdd2', 'wxx', 'wxx2', 'wdx', 'wzz'],
+  brutal: ['wzz', 'wsl', 'wdz', 'wjj', 'wsh', 'wzig', 'wdd2'],
 };
-const BALLS = { easy: ['o'], med: ['oo', 'od'], hard: ['ooo', 'od'] };
-const MACHINES = { easy: ['m'], med: ['m', 'mx'], hard: ['mm', 'mx'] };
+const BALLS = { easy: ['o'], med: ['oo', 'od'], hard: ['ooo', 'od'], brutal: ['ooo', 'od'] };
+const MACHINES = { easy: ['m'], med: ['m', 'mx'], hard: ['mm', 'mx'], brutal: ['mm', 'mx'] };
 
+// Sværhedsgraden blev skruet kraftigt op 25/11: højere fart fra start, farten stiger mere gennem
+// hver bane, banerne er længere, og fra midten af ruten kommer der brutale bølger.
 export const LEVELS = [
   {
-    id: 'dragoer', name: 'Dragør Havn', theme: 'dragoer', speed: [220, 265], gap: 2,
-    intro: ['r8', 'b3', 'k', 'd', 'l', 'p', { hint: 'SLÅ PÅ QUIZKASSEN' }, 'q'],
-    waves: [{ n: 8, pool: 'easy' }, { n: 7, pool: 'med', shot: true, hint: 'SHOT ER VALGFRIT: DOBBELT POINT, MEN OP OG NED BYTTER OM' }, { n: 3, pool: 'hard' }],
+    id: 'dragoer', name: 'Dragør Havn', theme: 'dragoer', speed: [250, 330], gap: 1,
+    intro: ['r8', 'b3', 'k', 'd', 'l', 'p', { hint: 'SLÅ PÅ QUIZKASSEN. FORKERT SVAR KOSTER ET LIV' }, 'q'],
+    waves: [{ n: 10, pool: 'easy' }, { n: 13, pool: 'med', shot: true, hint: 'SHOT ER VALGFRIT: DOBBELT POINT, MEN OP OG NED BYTTER OM' }, { n: 10, pool: 'hard', quiz: true }],
     outro: ['b3', 'g'],
   },
   {
-    id: 'lufthavn', name: 'Lufthavnen', theme: 'lufthavn', speed: [235, 285], gap: 2,
+    id: 'lufthavn', name: 'Lufthavnen', theme: 'lufthavn', speed: [265, 350], gap: 1,
     intro: ['r8', 'b3', { hint: 'DRONER: SLÅ DEM NED ELLER UNDGÅ DEM' }, 'd', 'f'],
-    waves: [{ n: 8, pool: 'easy', quiz: true }, { n: 10, pool: 'med', shot: true }, { n: 5, pool: 'hard', quiz: true }],
+    waves: [{ n: 8, pool: 'easy', quiz: true }, { n: 16, pool: 'med', shot: true }, { n: 13, pool: 'hard', quiz: true }],
     outro: ['b3', 'g'],
   },
   {
-    id: 'blaaplanet', name: 'Den Blå Planet', theme: 'blaaplanet', speed: [230, 280], gap: 2, swim: true,
+    id: 'blaaplanet', name: 'Den Blå Planet', theme: 'blaaplanet', speed: [255, 340], gap: 1, swim: true,
     intro: ['r8', { hint: 'SWIPE OP OG NED FOR AT SVØMME OP OG NED' }, 'wb', 'wb2', { hint: 'GOPLER BRÆNDER: SVØM UDENOM' }, 'wx1',
       { hint: 'HAJER: TO SLAG ELLER SVØM UDENOM' }, 'wd2'],
-    waves: [{ n: 8, pool: 'easy', quiz: true }, { n: 10, pool: 'med', shot: true }, { n: 6, pool: 'hard', quiz: true }],
+    waves: [{ n: 8, pool: 'easy', quiz: true }, { n: 16, pool: 'med', shot: true }, { n: 16, pool: 'hard', quiz: true }],
     outro: ['wb', 'g'],
   },
   {
-    id: 'idraetspark', name: 'Sundby Idrætspark', theme: 'idraetspark', speed: [250, 305], gap: 2, extra: BALLS,
+    id: 'idraetspark', name: 'Sundby Idrætspark', theme: 'idraetspark', speed: [280, 365], gap: 1, extra: BALLS,
     intro: ['r8', 'b3', { hint: 'BOLDE: SLÅ DEM VÆK ELLER UNDGÅ DEM' }, 'o', { hint: 'HÆKKE SKAL MAN HOPPE OVER' }, 'x'],
-    waves: [{ n: 7, pool: 'easy', quiz: true }, { n: 10, pool: 'med', shot: true }, { n: 7, pool: 'hard', quiz: true }],
+    waves: [{ n: 6, pool: 'easy', quiz: true }, { n: 16, pool: 'med', shot: true }, { n: 13, pool: 'hard', quiz: true }, { n: 6, pool: 'brutal' }],
     outro: ['b3', 'g'],
   },
   {
-    id: 'faelled', name: 'Amager Fælled', theme: 'faelled', speed: [260, 315], gap: 2, extra: MACHINES,
+    id: 'faelled', name: 'Amager Fælled', theme: 'faelled', speed: [290, 380], gap: 1, extra: MACHINES,
     intro: ['r8', 'b3', { hint: 'KØER SLÅR MAN IKKE. HOP!' }, 'x', { hint: 'BULLDOZER: TO SLAG ELLER ET HOP' }, 'm'],
-    waves: [{ n: 6, pool: 'easy', quiz: true }, { n: 11, pool: 'med', shot: true }, { n: 8, pool: 'hard', quiz: true }],
+    waves: [{ n: 5, pool: 'easy', quiz: true }, { n: 16, pool: 'med', shot: true }, { n: 14, pool: 'hard', quiz: true }, { n: 9, pool: 'brutal' }],
     outro: ['b3', 'g'],
   },
   {
-    id: 'dr', name: 'DR Byen', theme: 'dr', speed: [270, 330], gap: 2, extra: MACHINES,
+    id: 'dr', name: 'DR Byen', theme: 'dr', speed: [300, 390], gap: 1, extra: MACHINES,
     intro: ['r8', 'b3', { hint: 'LEDNINGER: HOP OVER' }, 'x', 'l'],
-    waves: [{ n: 6, pool: 'easy', quiz: true }, { n: 12, pool: 'med', shot: true }, { n: 9, pool: 'hard', quiz: true }],
+    waves: [{ n: 13, pool: 'med', quiz: true }, { n: 16, pool: 'hard', shot: true }, { n: 13, pool: 'brutal', quiz: true }],
     outro: ['b3', 'g'],
   },
   {
-    id: 'campus', name: 'Søndre Campus', theme: 'campus', speed: [280, 340], gap: 1,
+    id: 'campus', name: 'Søndre Campus', theme: 'campus', speed: [310, 400], gap: 0,
     intro: ['r8', 'bwave', 'k', 'f'],
-    waves: [{ n: 5, pool: 'easy', quiz: true }, { n: 12, pool: 'med', shot: true }, { n: 11, pool: 'hard', quiz: true }],
+    waves: [{ n: 12, pool: 'med', quiz: true }, { n: 16, pool: 'hard', shot: true }, { n: 16, pool: 'brutal', quiz: true }],
     outro: ['b3', 'g'],
   },
   {
-    id: 'center', name: 'Amager Centret', theme: 'center', speed: [290, 355], gap: 1,
+    id: 'brygge', name: 'Islands Brygge', theme: 'brygge', speed: [315, 405], gap: 0, extra: BALLS,
+    intro: ['r8', 'b3', { hint: 'ROCKERE OG FESTABER I BADETØJ: HOP!' }, 'x', { hint: 'LØSE KAMPHUNDE: SLÅ ELLER HOP PÅ DEM' }, 'd',
+      { hint: 'GUIRLANDER: SLIDE UNDER' }, 'l', 'k'],
+    waves: [{ n: 10, pool: 'med', quiz: true }, { n: 16, pool: 'hard', shot: true }, { n: 18, pool: 'brutal', quiz: true }],
+    outro: ['b3', 'g'],
+  },
+  {
+    id: 'center', name: 'Amager Centret', theme: 'center', speed: [320, 410], gap: 0,
     intro: ['r8', 'b3', 'k', 'l'],
-    waves: [{ n: 4, pool: 'easy' }, { n: 13, pool: 'med', shot: true, quiz: true }, { n: 13, pool: 'hard', quiz: true }],
+    waves: [{ n: 10, pool: 'med', quiz: true }, { n: 16, pool: 'hard', shot: true }, { n: 18, pool: 'brutal', quiz: true }],
     outro: ['b3', 'g'],
   },
   {
-    id: 'jaguaren', name: 'Jaguaren', theme: 'jaguaren', speed: [300, 370], gap: 1,
+    id: 'amagerbio', name: 'Amager Bio', theme: 'amagerbio', speed: [330, 420], gap: 0,
+    intro: ['r8', { hint: 'FADØL! SAML DEM OP' }, 'b3', { hint: 'MUSIKERE OG TROMMESÆT: HOP!' }, 'x',
+      { hint: 'MIKROFONEN SVINGER: SLIDE UNDER' }, 'l', 'f'],
+    waves: [{ n: 10, pool: 'med', quiz: true }, { n: 16, pool: 'hard', shot: true }, { n: 20, pool: 'brutal', quiz: true }],
+    outro: ['b3', 'g'],
+  },
+  {
+    id: 'strandpark', name: 'Amager Strandpark', theme: 'strandpark', speed: [340, 430], gap: 0, extra: BALLS,
+    intro: ['r8', 'b3', { hint: 'NUDISTER OG PARASOLLER: HOP!' }, 'x', { hint: 'KITESURFERE: SLÅ DEM NED ELLER SLIDE' }, 'f',
+      { hint: 'REDNINGSKRANSE OG BADEBOLDE: SLÅ DEM VÆK' }, 'd', 'o'],
+    waves: [{ n: 9, pool: 'med', quiz: true }, { n: 16, pool: 'hard', shot: true }, { n: 21, pool: 'brutal', quiz: true }],
+    outro: ['b3', 'g'],
+  },
+  {
+    id: 'jaguaren', name: 'Jaguaren', theme: 'jaguaren', speed: [350, 445], gap: 0,
     intro: ['r8', 'b3', { hint: 'ROCKERE SLÅR MAN IKKE. HOP!' }, 'x', 'f'],
-    waves: [{ n: 13, pool: 'med', quiz: true }, { n: 8, pool: 'hard', shot: true }, { n: 9, pool: 'hard', quiz: true }],
+    waves: [{ n: 8, pool: 'med', quiz: true }, { n: 16, pool: 'hard', shot: true }, { n: 23, pool: 'brutal', quiz: true }],
     outro: ['b3', 'g'],
   },
   {
-    id: 'copenhill', name: 'CopenHill', theme: 'copenhill', speed: [310, 380], gap: 1,
+    id: 'copenhill', name: 'CopenHill', theme: 'copenhill', speed: [360, 460], gap: 0,
     intro: ['r8', 'b3', 'k', 'f'],
-    waves: [{ n: 12, pool: 'med', quiz: true }, { n: 10, pool: 'hard', shot: true }, { n: 10, pool: 'hard', quiz: true }],
+    waves: [{ n: 8, pool: 'med', quiz: true }, { n: 16, pool: 'hard', shot: true }, { n: 23, pool: 'brutal', quiz: true }],
     outro: ['c', 'r4', 'boss'],
   },
 ];
@@ -228,7 +267,7 @@ export function expandLayout(level) {
       do { pick = pool[Math.floor(rand() * pool.length)]; } while (pick === last && pool.length > 1);
       out.push(pick);
       last = pick;
-      if (i % 4 === 3) out.push(level.swim ? 'wb' : 'b3');
+      if (i % 6 === 5) out.push(level.swim ? 'wb' : 'b3');   // en bølge bajere en gang imellem
     }
   });
   return [...out, ...level.outro];
@@ -238,7 +277,7 @@ export function expandLayout(level) {
 // Afstanden regnes om til kolonner ud fra banens topfart, så banerne altid kan klares,
 // uanset hvor hurtigt det går. Er to ting for tæt, indsættes der tomme kolonner.
 const KIND = { x: 'jump', k: 'tap', d: 'tap', f: 'tap', o: 'tap', m: 'heavy', l: 'slide' };
-const NEED = { jump: 1.12, tap: 0.42, slide: 0.55, heavy: 1.0, swim: 0.75 };
+const NEED = { jump: 1.02, tap: 0.38, slide: 0.5, heavy: 0.92, swim: 0.66 };   // strammet 25/11
 
 function spaceOut(rows, level) {
   const v = Array.isArray(level.speed) ? level.speed[1] : level.speed;

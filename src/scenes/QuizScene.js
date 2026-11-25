@@ -1,5 +1,5 @@
 // Quizkassen: banen står på pause, mens spørgsmålet vises med tre svarknapper.
-// Rigtigt svar giver et ekstra liv og point. Resultatet sendes tilbage til banen som 'quiz-done'.
+// Rigtigt svar giver et ekstra liv og point. Forkert svar koster et liv (25/11). Resultatet sendes tilbage til banen som 'quiz-done'.
 
 import { GAME_W, GAME_H } from '../config.js';
 import { txt, panel, button, dim, C } from '../game/ui.js';
@@ -17,7 +17,7 @@ export default class QuizScene extends Phaser.Scene {
     panel(this, 60, 30, GAME_W - 120, GAME_H - 60);
     txt(this, GAME_W / 2, 56, 'QUIZKASSE', { font: 'big_o', scale: 2, tint: C.yellow });
     txt(this, GAME_W / 2, 100, q.q, { font: 'ui', maxWidth: 460, center: true });
-    this.feedback = txt(this, GAME_W / 2, 306, 'Rigtigt svar giver et ekstra liv', { font: 'ui', tint: C.soft });
+    this.feedback = txt(this, GAME_W / 2, 306, 'Rigtigt svar: ekstra liv. Forkert: du mister et liv', { font: 'ui', tint: C.soft });
     this.locked = false;
     this.buttons = answers.map((a, i) => button(this, GAME_W / 2, 152 + i * 46, 420, 38, a, () => this.pick(a, correct), { color: C.panel }));
     this.input.keyboard?.on('keydown', (ev) => {
@@ -36,7 +36,7 @@ export default class QuizScene extends Phaser.Scene {
       else if (b.label.text === answer) b.label.setTint(0xff8a8a);
     });
     sfx(ok ? 'right' : 'wrong');
-    this.feedback.setText(ok ? 'RIGTIGT! Ekstra liv og 500 point' : `Forkert. Svaret var: ${correct}`).setTint(ok ? 0x8af0a0 : 0xff8a8a);
+    this.feedback.setText(ok ? 'RIGTIGT! Ekstra liv og 500 point' : `FORKERT! -1 LIV. Svaret var: ${correct}`).setTint(ok ? 0x8af0a0 : 0xff8a8a);
     this.time.delayedCall(ok ? 1000 : 1700, () => {
       const level = this.scene.get('Level');
       this.scene.stop();

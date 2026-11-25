@@ -56,6 +56,10 @@ export default class BootScene extends Phaser.Scene {
     loop('rocker_walk', ['enemy/rocker0', 'enemy/rocker1'], 4);
     loop('shark', ['enemy/shark0', 'enemy/shark1'], 6);
     loop('jelly', ['enemy/jelly0', 'enemy/jelly1'], 4);
+    loop('nudist_run', ['enemy/nudist0', 'enemy/nudist1'], 8);
+    loop('kite_fly', ['enemy/kite0', 'enemy/kite1'], 4);
+    loop('guitar_walk', ['enemy/guitar0', 'enemy/guitar1'], 5);
+    loop('bather_dance', ['enemy/bather0', 'enemy/bather1'], 4);
 
     // Kun topscorerlisten kan åbnes direkte: ?scene=Scores. Testgenvejene er fjernet i den udgivne version.
     const q = new URLSearchParams(window.location.search);

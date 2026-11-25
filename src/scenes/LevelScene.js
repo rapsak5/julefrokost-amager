@@ -63,7 +63,9 @@ export default class LevelScene extends Phaser.Scene {
 
     const startX = this.resumeFrom ? this.resumeFrom.x : 100;
     this.player = new Player(this, startX, GROUND_Y, this.fisherId);
-    this.physics.add.collider(this.player, this.groundBodies);
+    this.arenaPits = [];     // huller på løbebåndet under bosskampen (se Boss.js)
+    this.pitFall = null;     // det hul, fiskeren er ved at falde ned i
+    this.physics.add.collider(this.player, this.groundBodies, null, () => !this.overArenaPit());
     if (this.swim) this.player.enableSwim([SWIM_Y.hi, SWIM_Y.mid, SWIM_Y.lo]);
     while (this.spawnIdx < this.built.spawns.length && this.built.spawns[this.spawnIdx].x <= startX + 40) {
       // ting bag et checkpoint springes over, men bossen skal stadig kunne udløses
@@ -164,6 +166,7 @@ export default class LevelScene extends Phaser.Scene {
     if (!arena) this.speed = this.speedStart + (this.speedEnd - this.speedStart) * Phaser.Math.Clamp(p.x / this.built.width, 0, 1);
     p.setVelocityX(arena ? 0 : this.speed);
     if (arena) this.treadmill += this.speed * dt;
+    this.updateArenaPits(dt, arena, cam.scrollX);
     p.rainbow = this.shotActive();
     p.tick(now);
 
@@ -224,6 +227,7 @@ export default class LevelScene extends Phaser.Scene {
     const s = this.add.sprite(sp.x, y, 'atlas', def.frame).setDepth(DEPTH.ent).setOrigin(0.5, bottom ? 1 : 0.5);
     if (def.anim) s.play(def.anim);
     const e = { sp, def, s, bottom, baseY: y, hp: def.hp ?? 1, alive: true, lastSwingId: -1, phase: sp.x * 0.7 };
+    if (def.sway) { s.setOrigin(0.5, 0); s.y = y - s.height; }   // ophænget er øverst
     this.ents.push(e);
     return e;
   }
@@ -236,6 +240,12 @@ export default class LevelScene extends Phaser.Scene {
 
   entRect(e) {
     const [w, h] = e.def.box || [e.s.width, e.s.height];
+    if (e.def.sway) {
+      // bunden af det, der svinger: ophænget plus længden drejet med vinklen
+      const bx = e.s.x - Math.sin(e.s.rotation) * e.s.height;
+      const by = e.s.y + Math.cos(e.s.rotation) * e.s.height;
+      return { x: bx - w / 2, y: by - h, w, h };
+    }
     return e.bottom ? { x: e.s.x - w / 2, y: e.s.y - h, w, h } : { x: e.s.x - w / 2, y: e.s.y - h / 2, w, h };
   }
 
@@ -252,6 +262,7 @@ export default class LevelScene extends Phaser.Scene {
       if (d.bob) e.s.y = e.baseY + Math.round(Math.sin((now + e.phase) / 260) * d.bob);
       if (d.wave) e.s.y = e.baseY + Math.sin((now + e.phase) / 220) * d.wave;
       if (d.spin) e.s.angle += d.spin * dt;
+      if (d.sway) e.s.rotation = Math.sin((now + e.phase) / (d.swayMs || 450)) * d.sway;
       if (d.bounce) {
         e.vy = (e.vy ?? 0) + 1300 * dt;
         e.s.y += e.vy * dt;
@@ -370,9 +381,68 @@ export default class LevelScene extends Phaser.Scene {
     if (this.st.hearts <= 0) this.die();
   }
 
+  // ---------- huller på løbebåndet (bosskampen) ----------
+  /** Lægger et hul ind lige uden for højre kant. Det ruller mod fiskeren med løbebåndet. */
+  spawnArenaPit(w) {
+    const x0 = this.cameras.main.scrollX + GAME_W + 20;
+    const s = this.add.tileSprite(x0, GROUND_Y, w, GAME_H - GROUND_Y, `${this.level.theme}_pit`).setOrigin(0).setDepth(DEPTH.pit);
+    this.arenaPits.push({ x0, x1: x0 + w, s });
+  }
+
+  /** Hvor mange ms der går, før et nyt hul med bredden w er midt under fiskeren. */
+  arenaPitEta(w) {
+    const x0 = this.cameras.main.scrollX + GAME_W + 20;
+    return ((x0 + w / 2 - this.player.x) / Math.max(1, this.speed)) * 1000;
+  }
+
+  /** Er der et hul under fiskeren omkring tMs fra nu (plus/minus win ms)? */
+  arenaPitNear(tMs, win) {
+    const v = Math.max(1, this.speed) / 1000;
+    const px = this.player.x;
+    return this.arenaPits.some((q) => {
+      const tin = (q.x0 + 8 - px) / v;
+      const tout = (q.x1 - 8 - px) / v;
+      return tout > 0 && tin - win < tMs && tout + win > tMs;
+    });
+  }
+
+  arenaPitUnder() {
+    const x = this.player.x;
+    return this.arenaPits.find((q) => x > q.x0 + 8 && x < q.x1 - 8) || null;
+  }
+
+  overArenaPit() { return !!this.pitFall || !!this.arenaPitUnder(); }
+
+  updateArenaPits(dt, arena, scrollX) {
+    if (!this.arenaPits.length) return;
+    for (const q of this.arenaPits) {
+      if (arena) { q.x0 -= this.speed * dt; q.x1 -= this.speed * dt; q.s.x = q.x0; }
+      if (q.x1 < scrollX - 60) { q.s.destroy(); q.gone = true; }
+    }
+    this.arenaPits = this.arenaPits.filter((q) => !q.gone);
+    const p = this.player;
+    if (!this.pitFall && p.y > GROUND_Y + 4) this.pitFall = this.arenaPitUnder();
+  }
+
   checkPit(now) {
     const p = this.player;
     if (p.y < GROUND_Y + 90) return;
+    if (this.pitFall) {
+      // faldt i et hul på løbebåndet: hullet forsvinder, og fiskeren står op igen samme sted
+      const q = this.pitFall;
+      this.pitFall = null;
+      const ax = this.boss?.arena ? p.x : q.x1 + 40;
+      q.s.destroy();
+      this.arenaPits = this.arenaPits.filter((r) => r !== q);
+      this.st.hearts--;
+      sfx('hurt');
+      this.emitHud();
+      if (this.st.hearts <= 0) { this.die(); return; }
+      p.body.reset(ax, GROUND_Y);
+      p.invulnUntil = now + TUNING.invulnMs + 300;
+      p.sliding = false;
+      return;
+    }
     const pit = this.built.pits.find((q) => p.x >= q.x0 - 30 && p.x <= q.x1 + 60) || { x1: p.x };
     this.st.hearts--;
     sfx('hurt');
@@ -449,10 +519,18 @@ export default class LevelScene extends Phaser.Scene {
   }
 
   onQuizDone(ok) {
+    const p = this.player;
     if (ok) {
-      const p = this.player;
       if (this.st.hearts < TUNING.maxHearts) { this.st.hearts++; this.popup('+1 LIV', p.x, p.y - 100, 0xff9aa0); }
       this.addScore(SCORE.quiz, p.x, p.y - 84);
+    } else {
+      // forkert svar koster et liv (25/11)
+      this.st.hearts--;
+      sfx('hurt');
+      this.cameras.main.shake(130, 0.007);
+      this.popup('-1 LIV', p.x, p.y - 100, 0xff6a6a);
+      this.emitHud();
+      if (this.st.hearts <= 0) { this.die(); return; }
     }
     this.player.invulnUntil = this.clock + 900;   // et øjeblik til at finde rytmen igen
     this.emitHud();

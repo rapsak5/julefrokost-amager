@@ -12,7 +12,7 @@
 //   1. Loft pr. bane: banens højst mulige point (alle bajere, alle fjender, quiz, hjerter, boss) gange 1,5.
 //   2. Rækkefølge: en bane tæller kun, hvis fiskeren allerede har point på banen før.
 //   3. Tid: der skal gå mindst MIN_GAP_MS mellem to godkendte rekorder for samme fisker.
-//      Den korteste bane tager ca. 70 sekunder at løbe igennem.
+//      Den korteste bane tager ca. 95 sekunder at løbe igennem (25/11).
 // Alle indsendelser logges (godkendte og afviste) med tid, land og et kort id for enheden.
 // Afviste svarer stadig { ok: true }, så en snyder ikke kan se, hvilket tjek han ramte.
 //
@@ -20,11 +20,12 @@
 // Afviste logges højst MAX_REJECT_LOGS gange pr. døgn, så spam ikke æder gratiskvoten.
 
 const FISHERS = ['andreas', 'anders', 'mark', 'claus', 'theis', 'kenni', 'kasper'];
-const LEVELS = ['dragoer', 'lufthavn', 'blaaplanet', 'idraetspark', 'faelled', 'dr', 'campus', 'center', 'jaguaren', 'copenhill'];
-// Højst mulige point pr. bane (udregnet fra src/data/levels.js 24/11) gange 1,5, rundet op
+const LEVELS = ['dragoer', 'lufthavn', 'blaaplanet', 'idraetspark', 'faelled', 'dr', 'campus', 'brygge', 'center', 'amagerbio', 'strandpark', 'jaguaren', 'copenhill'];
+// Højst mulige point pr. bane (udregnet fra src/data/levels.js 25/11, 13 baner) gange 1,5, rundet op
 const MAX = {
-  dragoer: 16000, lufthavn: 24000, blaaplanet: 18000, idraetspark: 20000, faelled: 27000,
-  dr: 27000, campus: 28000, center: 30000, jaguaren: 30000, copenhill: 50000,
+  dragoer: 31000, lufthavn: 38000, blaaplanet: 35000, idraetspark: 36000, faelled: 41000,
+  dr: 43000, campus: 41000, brygge: 48000, center: 42000, amagerbio: 44000,
+  strandpark: 42000, jaguaren: 40000, copenhill: 89000,
 };
 const CLOSES_AT = Date.UTC(2026, 11, 27, 12, 0, 0);
 const MIN_GAP_MS = 55 * 1000;
