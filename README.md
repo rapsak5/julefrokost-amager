@@ -2,7 +2,7 @@
 
 Et lille 16-bit browserspil som opvarmning til julefrokosten 27. december 2026. Man vælger sin fisker, løber tretten baner på Amager med en kæmpe pokal over hovedet, og til sidst får man hemmeligheden og en nedtælling.
 
-Status: **v0.9 (25/11)**: tretten baner, meget sværere end før. Spillet kan spilles fra start til slut, men al grafik er pladsholdere, og banerne er kun groft afstemt.
+Status: **v0.9.1 (27/11)**: checkpoints er tilbage. Før det, v0.9 (25/11): tretten baner, meget sværere end før. Spillet kan spilles fra start til slut, men al grafik er pladsholdere, og banerne er kun groft afstemt.
 
 ## Sådan køres det
 
@@ -32,7 +32,9 @@ Forsiden viser nedtællingen til julefrokosten søndag 27/12 kl. 13.00. Samtidig
 
 Banerne: Dragør Havn, Lufthavnen (droner), Den Blå Planet (under vand med hajer: swipe op og ned skifter svømmebane), Sundby Idrætspark (bolde og Sunnyside), Amager Fælled (bulldozere og køer), DR Byen (kameraer og ledninger), Søndre Campus, Islands Brygge (rockere, kamphunde, boomblastere og fest i badetøj), Amager Centret, Amager Bio, Amager Strandpark, Jaguaren (rockere) og CopenHill (Kæmpeduen, med huller i løbebåndet).
 
-Forkert svar i en quizkasse koster et liv. Grafikken til Islands Brygge tegnes af `tools/draw_brygge.py`.
+Forkert svar i en quizkasse koster et liv.
+
+Checkpoints (genindført 27/11): mellem bølgerne står et flag, som giver et ekstra liv. Dør man, starter man ved sidste flag med de point, man havde der, og fire liv. Slås fra med `CHECKPOINTS` i `src/config.js`. Sværhedsgraden er ikke ændret. Grafikken til Islands Brygge tegnes af `tools/draw_brygge.py`.
 
 ## Mapper
 

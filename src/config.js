@@ -1,6 +1,6 @@
 // Fælles konstanter. Alt, der skal justeres på spilfølelsen, står i TUNING.
 
-export const VERSION = '0.9.0';
+export const VERSION = '0.9.1';
 
 // Spillets interne opløsning. Skaleres op til skærmen med skarpe pixels.
 export const GAME_W = 640;
@@ -55,7 +55,8 @@ export const SCORES_CLOSE_UTC = EVENT_TIME_UTC;
 // Sæt til adressen på Cloudflare Workeren i server/, fx 'https://julefrokost-scores.<konto>.workers.dev'.
 export const SCORES_URL = 'https://julefrokost-scores.stemplerind.workers.dev';
 
-// Gutternes udgave: ingen checkpoints. En bane klares i ét hug, ellers starter man forfra.
-export const CHECKPOINTS = false;
+// Checkpoints mellem bølgerne (genindført 27/11, fordi banerne er blevet meget svære).
+// Dør man, starter man ved sidste flag med de point, man havde der. Sværhedsgraden er uændret.
+export const CHECKPOINTS = true;
 
 export const SAVE_KEY = 'amager-julefrokost-v1';
