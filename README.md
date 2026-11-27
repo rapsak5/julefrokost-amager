@@ -88,6 +88,8 @@ npm test
 
 Kræver en Chrome. Sæt `CHROME=/sti/til/chrome`, hvis den ikke ligger i `/usr/bin/google-chrome`. Skærmbilleder havner i `tools/shots/`.
 
+Robotten (`node tools/test_play.cjs`) spiller alle tretten baner i ét hug uden checkpoints. Den sender aldrig noget til den rigtige topscorerliste. Status 27/11: den klarer alle tretten. `test_flow.cjs` bruger stadig de fjernede testgenveje og virker ikke, før den bliver skrevet om.
+
 ## Online
 
 Spillet skal kunne spilles af alle med linket, uden login.

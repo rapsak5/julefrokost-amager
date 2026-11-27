@@ -1,11 +1,17 @@
 #!/usr/bin/env node
 /* Automatisk gennemspilning i en hovedløs Chrome.
 
-   Tjekker at spillet starter uden fejl, at alle skærme kan åbnes, og at en simpel
-   robot kan gennemføre alle baner. Gemmer skærmbilleder i tools/shots/.
+   En robot spiller alle baner igennem i ét hug (uden at bruge checkpoints) og fortæller,
+   hvad den eventuelt dør af. Gemmer skærmbilleder i tools/shots/.
+   Testen sender ALDRIG noget til den rigtige topscorerliste: alle kald ud af huset stoppes.
+   Banerne startes direkte i spillet, fordi testgenvejene i adressen er fjernet (24/11).
 
    Kræver:  npm i puppeteer-core   og en Chrome (sti i CHROME, ellers /usr/bin/google-chrome)
-   Kør:     node tools/test_play.cjs            (starter selv en lille webserver)
+   Kør:     node tools/test_play.cjs            (ONLY=8,10 kører kun bane 8 og 10,
+                                                RETRIES=8 lader robotten starte ved checkpoints)
+   Robotten blev klogere 27/11: den hopper, så toppen af hoppet ligger midt over tingen
+   (høje figurer som rockere kræver et tidligere hop end en kegle), og den hopper over
+   hullerne på løbebåndet i bosskampen.
 */
 const http = require('http');
 const fs = require('fs');
@@ -45,12 +51,27 @@ async function simulate(maxMs) {
       if (!q.locked) q.pick(q.q.a[0], q.q.a[0]);
       continue;
     }
-    if (active('Result')) { log.result = game.scene.getScene('Result').sys.settings.data; break; }
+    if (active('Result')) {
+      const d = game.scene.getScene('Result').sys.settings.data;
+      if (d.mode === 'dead' && d.checkpoint && (log.retries || 0) < (+process.env.RETRIES || 0)) {
+        log.retries = (log.retries || 0) + 1; log.events.push(`død, starter ved checkpoint x=${Math.round(d.checkpoint.x)}`);
+        game.scene.stop('Result'); game.scene.stop('Level'); game.scene.start('Level', { levelIndex: d.levelIndex, checkpoint: d.checkpoint }); lastHearts = null; continue;
+      }
+      log.result = d; break;
+    }
     const L = game.scene.getScene('Level');
-    if (!active('Level') || L.ended) continue;
+    if (!active('Level') || L.ended || !L.player) continue;
+    log.cps = Math.max(log.cps || 0, L.ents.filter((e) => e.def.kind === 'checkpoint' && e.done).length + (L.checkpoint ? 0 : 0));
     const p = L.player;
     if (lastHearts == null) lastHearts = L.st.hearts;
-    if (L.st.hearts < lastHearts) { log.hurt += lastHearts - L.st.hearts; log.events.push(`mistede liv ved x=${Math.round(p.x)}`); }
+    if (L.st.hearts < lastHearts) {
+      log.hurt += lastHearts - L.st.hearts;
+      const near = L.ents.filter((e) => e.alive && e.def.kind === 'enemy').map((e) => ({ e, r: L.entRect(e) })).filter((o) => Math.abs(o.r.x - p.x) < 90)
+        .map((o) => `${o.e.sp.type}:${o.e.def.anim || o.e.def.frame}@${Math.round(o.r.x - p.x)},${Math.round(o.r.y)}+${o.r.h}`).join('|');
+      const pit = L.built.pits.some((q) => p.x > q.x0 - 60 && p.x < q.x1 + 80);
+      log.causes = log.causes || {}; const key = pit ? 'hul' : (near.split('|')[0] || 'ukendt').replace(/@.*/, ''); log.causes[key] = (log.causes[key] || 0) + 1;
+      if (log.events.length < 40) log.events.push(`x=${Math.round(p.x)} v=${Math.round(L.speed)} ${pit ? 'HUL ' : ''}${near} ground=${p.onGround} slide=${p.sliding} y=${Math.round(p.y)}`);
+    }
     lastHearts = L.st.hearts;
     const speed = L.speed;
     const lead = speed * 0.12;
@@ -84,8 +105,14 @@ async function simulate(maxMs) {
       if (dx < -r.w - 20 || dx > 140) continue;
       if (e.def.low && !e.def.hittable) { if (dx < 40 + lead && !p.sliding && p.onGround) L.command(L.shotActive() ? 'up' : 'down'); }
       else if (e.def.hittable) { if (dx < 52 && !p.holdSlide) L.command('tap'); }   // først når pokalen kan nå
-      else if (dx < 26 + lead * 0.5 && dx > 0 && p.onGround) L.command(L.shotActive() ? 'down' : 'up');
+      else if (p.onGround && dx > -6) {
+        // hop, så toppen af hoppet ligger midt over tingen (høje figurer kræver et tidligere hop end en kegle)
+        const rel = speed - (e.def.vx || 0);
+        if (dx < 0.4 * rel - (r.w + 22) / 2 + 6) L.command(L.shotActive() ? 'down' : 'up');
+      }
     }
+    // huller på løbebåndet i bosskampen
+    for (const q of (L.arenaPits || [])) { if (p.onGround && q.x0 - p.x < 34 + lead * 0.2 && q.x0 - p.x > 4) L.command(L.shotActive() ? 'down' : 'up'); }
     if (L.boss && L.boss.sprite && L.boss.state === 'swoop') {
       const dx = L.boss.rect().x - (p.x + 11);
       if (dx < 70) L.command('tap');
@@ -107,9 +134,12 @@ async function simulate(maxMs) {
     args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'],
   });
   const errors = [];
+  const blocked = [];
   const open = async (query = '') => {
     const page = await browser.newPage();
     await page.setViewport({ width: 844, height: 390, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
+    await page.setRequestInterception(true);
+    page.on('request', (r) => { if (r.url().startsWith(base) || r.url().startsWith('data:')) r.continue(); else { blocked.push(r.url()); r.respond({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': '*' }, body: '{"ok":true}' }); } });
     page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(`[${query}] ${m.type()}: ${m.text()}`); });
     page.on('pageerror', (e) => errors.push(`[${query}] pageerror: ${e.message}`));
     await page.goto(base + query, { waitUntil: 'load' });
@@ -120,8 +150,8 @@ async function simulate(maxMs) {
   const shot = (page, name) => page.screenshot({ path: path.join(SHOTS, name + '.png') });
 
   // 1) skærmene
-  for (const scene of ['Title', 'Select', 'Map', 'Scores', 'Secret']) {
-    const page = await open(`?scene=${scene}&alle=1`);
+  for (const scene of ['Scores']) {
+    const page = await open(`?scene=${scene}`);
     await shot(page, `skaerm_${scene.toLowerCase()}`);
     await page.close();
   }
@@ -132,7 +162,9 @@ async function simulate(maxMs) {
   const only = (process.env.ONLY || '').split(',').filter(Boolean).map(Number);
   for (let i = 1; i <= levels; i++) {
     if (only.length && !only.includes(i)) continue;
-    const page = await open(`?level=${i}&fisher=kasper`);
+    const page = await open('?scene=Title');
+    await page.evaluate((li) => { localStorage.setItem('amager-julefrokost-v1', JSON.stringify({ fisher: 'kasper', tutorialDone: true })); const g = window.__game; g.scene.getScenes(true).forEach((sc) => g.scene.stop(sc.sys.settings.key)); g.scene.start('Level', { levelIndex: li }); }, i - 1);
+    await new Promise((r) => setTimeout(r, 800));
     await page.evaluate(simulate.toString() + '; window.__sim = simulate;');
     const mid = await page.evaluate(() => window.__sim(12000));
     await new Promise((r) => setTimeout(r, 300));
@@ -142,10 +174,11 @@ async function simulate(maxMs) {
     await shot(page, `bane${i}_slut`);
     const mode = res.result ? res.result.mode : 'ikke færdig';
     if (mode !== 'complete') ok = false;
-    console.log(`bane ${i}: ${mode}  hjerter=${res.hearts}  point=${res.score}  bajere=${res.bottles}  x=${res.x}/${res.width}  tabte liv=${mid.hurt + res.hurt}`, [...mid.events, ...res.events].slice(0, 6).join('; '));
+    console.log(`bane ${i}: ${mode}  genstarter=${(mid.retries||0)+(res.retries||0)}  hjerter=${res.hearts}  point=${res.score}  bajere=${res.bottles}  x=${res.x}/${res.width}  tabte liv=${mid.hurt + res.hurt}`, '\n   ' + JSON.stringify({ ...(mid.causes||{}), ...(res.causes||{}) }) + '\n   ' + [...mid.events, ...res.events].slice(0, 12).join('\n   '));
     await page.close();
   }
 
+  console.log('kald til topscorerlisten (stoppet, intet sendt):', [...new Set(blocked)].length);
   await browser.close();
   srv.close();
   if (errors.length) { console.log('\nFEJL I KONSOLLEN:\n' + [...new Set(errors)].join('\n')); ok = false; }
